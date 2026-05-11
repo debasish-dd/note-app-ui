@@ -3,22 +3,26 @@ import {
   Text,
   View,
   StyleSheet,
-  Switch,
   useColorScheme,
   TextInput,
   Pressable,
   Alert,
   FlatList,
   TouchableOpacity,
-  ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  Moon,
+  Sun,
+} from "lucide-react-native";
+import Note from "@/components/Note";
+
+
 
 export default function Index() {
   const colorScheme = useColorScheme();
   const [isEnabled, setIsEnabled] = useState(colorScheme === "dark");
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
-
+  
   type FormDataType = {
     title: string;
     description: string;
@@ -101,34 +105,49 @@ export default function Index() {
 
   if (selectedNote) {
     return (
-     <SafeAreaView style={styles.detailContainer}>
-  <View style={styles.detailHeader}>
-    <TouchableOpacity onPress={() => setSelectedNote(null)} style={styles.backButton}>
-      <Text style={styles.backArrow}>←</Text>
-      <Text style={styles.backText}>Notes</Text>
-    </TouchableOpacity>
-  </View>
-  <ScrollView contentContainerStyle={styles.detailContent}>
-    <Text style={styles.detailTitle}>{selectedNote.title}</Text>
-    <View style={styles.divider} />
-    <Text style={styles.detailDescription}>{selectedNote.description}</Text>
-  </ScrollView>
-</SafeAreaView>
+      <Note selectedNote={selectedNote} setSelectedNote={setSelectedNote} themeMode={isEnabled}/>
     );
   }
+
   return (
     <SafeAreaView
       style={[styles.container, isEnabled && { backgroundColor: "#313131" }]}
     >
       {/* theme changer  */}
       <View style={switchBorder}>
-        <Switch
-          trackColor={{ false: "#000000", true: "#ffffff" }}
-          thumbColor={isEnabled ? "#000000" : "#ffffff"}
-          ios_backgroundColor="#3e3e3e"
-          onValueChange={toggleSwitch}
-          value={isEnabled}
-        />
+        <Pressable
+          onPress={() =>
+            setIsEnabled(!isEnabled)
+          }
+          style={[
+            styles.switch,
+            {
+              justifyContent:
+                isEnabled
+                  ? "flex-end"
+                  : "flex-start",
+              backgroundColor:
+                isEnabled
+                  ? "#222"
+                  : "#ddd",
+            },
+          ]}
+        >
+          <View style={styles.thumb}>
+            {isEnabled ? (
+              <Moon
+                size={18}
+                color="white"
+              />
+            ) : (
+              <Sun
+                size={18}
+                color="black"
+              />
+            )}
+          </View>
+        </Pressable>
+
         <Text style={baseColor.theText}>
           {isEnabled ? "Dark Mode" : "Light Mode"}
         </Text>
@@ -205,6 +224,22 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
   },
+  switch: {
+    width: 80,
+    height: 40,
+    borderRadius: 30,
+    padding: 4,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  thumb: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   switchContainer: {
     elevation: 0,
     borderRadius: 50,
@@ -213,6 +248,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     flexDirection: "row",
     justifyContent: "space-between",
+    padding: 4,
   },
   inputComponent: {
     borderWidth: 1,
