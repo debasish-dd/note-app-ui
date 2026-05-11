@@ -9,6 +9,8 @@ import {
   Pressable,
   Alert,
   FlatList,
+  TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -55,6 +57,10 @@ export default function Index() {
     }
 
     setNoteData((prev) => [...prev, formData]);
+    setFormData({
+      title: "",
+      description: ""
+    })
   };
 
   const switchBorder = StyleSheet.flatten([
@@ -90,6 +96,26 @@ export default function Index() {
       </View>
     );
   };
+
+  const [selectedNote, setSelectedNote] = useState<FormDataType | null>(null);
+
+  if (selectedNote) {
+    return (
+     <SafeAreaView style={styles.detailContainer}>
+  <View style={styles.detailHeader}>
+    <TouchableOpacity onPress={() => setSelectedNote(null)} style={styles.backButton}>
+      <Text style={styles.backArrow}>←</Text>
+      <Text style={styles.backText}>Notes</Text>
+    </TouchableOpacity>
+  </View>
+  <ScrollView contentContainerStyle={styles.detailContent}>
+    <Text style={styles.detailTitle}>{selectedNote.title}</Text>
+    <View style={styles.divider} />
+    <Text style={styles.detailDescription}>{selectedNote.description}</Text>
+  </ScrollView>
+</SafeAreaView>
+    );
+  }
   return (
     <SafeAreaView
       style={[styles.container, isEnabled && { backgroundColor: "#313131" }]}
@@ -164,7 +190,11 @@ export default function Index() {
       <FlatList
         data={noteData}
         keyExtractor={(_, index) => index.toString()}
-        renderItem={({ item }) => <Card data={item} />}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => setSelectedNote(item)}>
+            <Card data={item} />
+          </TouchableOpacity>
+        )}
       />
     </SafeAreaView>
   );
@@ -205,9 +235,7 @@ const styles = StyleSheet.create({
     width: 70,
     justifyContent: "center",
     alignItems: "center",
-
     borderRadius: 14,
-
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -215,7 +243,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 6,
-
     elevation: 6,
   },
   card: {
@@ -227,5 +254,48 @@ const styles = StyleSheet.create({
     padding: 8,
     justifyContent: "center",
     alignItems: "flex-start",
+  },
+  // Detail Screen
+  detailContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  detailHeader: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  backArrow: {
+    fontSize: 20,
+    color: "#007AFF",
+  },
+  backText: {
+    fontSize: 16,
+    color: "#007AFF",
+  },
+  detailContent: {
+    padding: 20,
+  },
+  detailTitle: {
+    fontSize: 26,
+    fontWeight: "700",
+    color: "#111",
+    marginBottom: 16,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#eee",
+    marginBottom: 16,
+  },
+  detailDescription: {
+    fontSize: 16,
+    lineHeight: 26,
+    color: "#444",
   },
 });
