@@ -1,56 +1,204 @@
-# Welcome to your Expo app 👋
+# React Native Notes App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A simple Notes App UI built with React Native and Expo.
 
-## Get started
+This project was created while learning React Native fundamentals such as:
 
-1. Install dependencies
+- State management using `useState`
+- Dynamic theming (Dark/Light mode)
+- Form handling
+- FlatList rendering
+- Search functionality
+- Conditional rendering
+- Reusable components
+- React Native styling
+- Navigation through state-based rendering
 
-   ```bash
-   npm install
-   ```
+---
 
-2. Start the app
+# Features
 
-   ```bash
-   npx expo start
-   ```
+- Create notes
+- Search notes by title or description
+- Dark / Light mode toggle
+- Dynamic UI rendering
+- View full note details
+- KeyboardAvoidingView support
+- FlatList optimization
+- Custom theme styling
 
-In the output, you'll find options to open the app in a
+---
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+# Tech Stack
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- React Native
+- Expo
+- TypeScript
+- Lucide React Native Icons
 
-## Get a fresh project
+---
 
-When you're ready, run:
+# Screenshots
+
+## Light Mode
+
+(Add screenshot here)
+
+## Dark Mode
+
+(Add screenshot here)
+
+## Search Functionality
+
+(Add screenshot here)
+
+---
+
+# Installation
+
+Clone the repository:
 
 ```bash
-npm run reset-project
+git clone https://github.com/your-username/your-repo-name.git
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Move into the project directory:
 
-### Other setup steps
+```bash
+cd your-repo-name
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Install dependencies:
 
-## Learn more
+```bash
+npm install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Start Expo server:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npx expo start
+```
 
-## Join the community
+---
 
-Join our community of developers creating universal apps.
+# Project Structure
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+.
+├── app
+│   └── index.tsx
+├── components
+│   └── Note.tsx
+├── assets
+├── package.json
+└── README.md
+```
+
+---
+
+# Core Concepts Used
+
+## 1. State Management
+
+The project uses `useState` extensively for:
+
+- Theme state
+- Form state
+- Notes state
+- Search state
+- Selected note state
+
+---
+
+## 2. Search Functionality
+
+Search is implemented using:
+
+```tsx
+noteData.filter()
+```
+
+The app filters notes dynamically while typing.
+
+Search supports:
+
+- Title matching
+- Description matching
+- Case-insensitive search
+
+---
+
+## 3. Conditional Rendering
+
+Example:
+
+```tsx
+if (selectedNote) {
+  return <Note />
+}
+```
+
+The app switches screens without React Navigation.
+
+---
+
+## 4. Dynamic Theme System
+
+Theme colors are generated dynamically using:
+
+```tsx
+StyleSheet.create()
+```
+
+based on dark/light mode state.
+
+---
+
+# Challenges Faced
+
+- Managing multiple UI states
+- Implementing dynamic search
+- Conditional rendering logic
+- Theme synchronization
+- Handling FlatList rendering
+- Responsive styling
+
+---
+
+
+
+# Learning Outcome
+
+This project helped me understand:
+
+- React Native fundamentals
+- Component architecture
+- State-driven UI
+- List rendering
+- Dynamic styling
+- Search/filter logic
+- Mobile UI patterns
+
+---
+
+# Reviewer Notes
+
+This project focuses primarily on learning React Native fundamentals rather than production-level architecture.
+
+Main areas demonstrated:
+
+- Clean state updates
+- Functional React patterns
+- Dynamic rendering
+- Reusable UI components
+- User interaction handling
+
+---
+
+# Author
+
+Debasish Das
+
+GitHub:
+https://github.com/debasish-dd

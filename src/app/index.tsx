@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Text,
   View,
@@ -9,24 +9,25 @@ import {
   Alert,
   FlatList,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  ImageBackground,
+  StatusBar,
+  useWindowDimensions,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  Moon,
-  Sun,
-} from "lucide-react-native";
+import { Moon, Sun } from "lucide-react-native";
 import Note from "@/components/Note";
+import * as ScreenOrientation from "expo-screen-orientation";
 
-
-
+type FormDataType = {
+  title: string;
+  description: string;
+};
 export default function Index() {
   const colorScheme = useColorScheme();
   const [isEnabled, setIsEnabled] = useState(colorScheme === "dark");
-  
-  type FormDataType = {
-    title: string;
-    description: string;
-  };
+
   const [formData, setFormData] = useState<FormDataType>({
     title: "",
     description: "",
@@ -39,6 +40,16 @@ export default function Index() {
     },
   ]);
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const filteredNotes = searchQuery.trim()
+    ? noteData.filter(
+        (note) =>
+          note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          note.description.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+    : noteData;
+
+  //styles
   const baseColor = StyleSheet.create({
     theBorder: {
       borderColor: isEnabled ? "#ffffff" : "#000000",
@@ -63,8 +74,8 @@ export default function Index() {
     setNoteData((prev) => [...prev, formData]);
     setFormData({
       title: "",
-      description: ""
-    })
+      description: "",
+    });
   };
 
   const switchBorder = StyleSheet.flatten([
@@ -86,15 +97,7 @@ export default function Index() {
         >
           Title: {data.title}
         </Text>
-        <Text
-          style={[
-            baseColor.theButtonText,
-            {
-              fontWeight: "bold",
-            },
-          ]}
-          numberOfLines={2}
-        >
+        <Text style={[baseColor.theButtonText]} numberOfLines={2}>
           Description: {data.description}
         </Text>
       </View>
@@ -103,111 +106,136 @@ export default function Index() {
 
   const [selectedNote, setSelectedNote] = useState<FormDataType | null>(null);
 
+  const uri = !isEnabled
+    ? {
+        uri: "https://images.unsplash.com/photo-1619199003576-7cf4e1f7b25f?q=80&w=1866&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      }
+    : {
+        uri: "https://images.unsplash.com/photo-1776549157434-035d6b8141c9?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      };
+
   if (selectedNote) {
     return (
-      <Note selectedNote={selectedNote} setSelectedNote={setSelectedNote} themeMode={isEnabled}/>
+      <Note
+        selectedNote={selectedNote}
+        setSelectedNote={setSelectedNote}
+        themeMode={isEnabled}
+      />
     );
   }
-
   return (
     <SafeAreaView
       style={[styles.container, isEnabled && { backgroundColor: "#313131" }]}
     >
-      {/* theme changer  */}
-      <View style={switchBorder}>
-        <Pressable
-          onPress={() =>
-            setIsEnabled(!isEnabled)
-          }
-          style={[
-            styles.switch,
-            {
-              justifyContent:
-                isEnabled
-                  ? "flex-end"
-                  : "flex-start",
-              backgroundColor:
-                isEnabled
-                  ? "#222"
-                  : "#ddd",
-            },
-          ]}
+      <ImageBackground
+        style={styles.background}
+        imageStyle={{ borderRadius: 25 }}
+        source={uri}
+      >
+        {/* theme changer  */}
+        <View style={switchBorder}>
+          <Pressable
+            onPress={() => setIsEnabled(!isEnabled)}
+            style={[
+              styles.switch,
+              {
+                justifyContent: isEnabled ? "flex-end" : "flex-start",
+                backgroundColor: isEnabled ? "#222" : "#ddd",
+              },
+            ]}
+          >
+            <View style={styles.thumb}>
+              {isEnabled ? (
+                <Moon size={18} color="white" />
+              ) : (
+                <Sun size={18} color="black" />
+              )}
+            </View>
+          </Pressable>
+
+          <Text style={baseColor.theText}>
+            {isEnabled ? "Dark Mode" : "Light Mode"}
+          </Text>
+        </View>
+
+        {/* form  */}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.formContainer}
         >
-          <View style={styles.thumb}>
-            {isEnabled ? (
-              <Moon
-                size={18}
-                color="white"
-              />
-            ) : (
-              <Sun
-                size={18}
-                color="black"
-              />
-            )}
-          </View>
-        </Pressable>
-
-        <Text style={baseColor.theText}>
-          {isEnabled ? "Dark Mode" : "Light Mode"}
-        </Text>
-      </View>
-
-      {/* form  */}
-      <View style={styles.formContainer}>
-        <TextInput
-          placeholder="type your title heere"
-          placeholderTextColor={isEnabled ? "white" : "black"}
-          style={[
-            styles.inputComponent,
-            baseColor.theBorder,
-            baseColor.theText,
-          ]}
-          value={formData?.title}
-          onChangeText={(text) =>
-            setFormData((prev) => ({
-              ...prev,
-              title: text,
-            }))
-          }
-        />
-        <TextInput
-          placeholder="type your description heere"
-          placeholderTextColor={isEnabled ? "white" : "black"}
-          style={[
-            styles.inputComponent,
-            baseColor.theBorder,
-            baseColor.theText,
-          ]}
-          value={formData?.description}
-          onChangeText={(text) =>
-            setFormData((prev) => ({
-              ...prev,
-              description: text,
-            }))
-          }
-        />
-        <Pressable
-          onPress={onSubmitFn}
-          style={[styles.buttons, baseColor.theBackground]}
-        >
-          <Text style={baseColor.theButtonText}>add</Text>
-        </Pressable>
-      </View>
-
+          <TextInput
+            placeholder="type your title heere"
+            placeholderTextColor={isEnabled ? "white" : "black"}
+            style={[
+              styles.inputComponent,
+              baseColor.theBorder,
+              baseColor.theText,
+            ]}
+            value={formData?.title}
+            onChangeText={(text) =>
+              setFormData((prev) => ({
+                ...prev,
+                title: text,
+              }))
+            }
+          />
+          <TextInput
+            placeholder="type your description heere"
+            placeholderTextColor={isEnabled ? "white" : "black"}
+            style={[
+              styles.inputComponent,
+              baseColor.theBorder,
+              baseColor.theText,
+            ]}
+            value={formData?.description}
+            onChangeText={(text) =>
+              setFormData((prev) => ({
+                ...prev,
+                description: text,
+              }))
+            }
+          />
+          <Pressable
+            onPress={onSubmitFn}
+            style={[styles.buttons, baseColor.theBackground]}
+          >
+            <Text style={baseColor.theButtonText}>add</Text>
+          </Pressable>
+        </KeyboardAvoidingView>
+      </ImageBackground>
       {/* devider  */}
       <View
         style={[
           {
             borderWidth: 2,
+            marginTop: 5,
           },
           baseColor.theBorder,
         ]}
       />
-
-      {/* card section  */}
+      {/* search bar  */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          placeholder="🔍  Search by title..."
+          placeholderTextColor={isEnabled ? "#aaa" : "#777"}
+          style={[styles.searchInput, baseColor.theText]}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          clearButtonMode="while-editing"
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity
+            onPress={() => setSearchQuery("")}
+            style={{ paddingHorizontal: 6, paddingVertical: 2 }}
+          >
+            <Text style={[baseColor.theText]}>✕</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      
+       {/* card section  */}
       <FlatList
-        data={noteData}
+        data={filteredNotes}
         keyExtractor={(_, index) => index.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => setSelectedNote(item)}>
@@ -215,15 +243,20 @@ export default function Index() {
           </TouchableOpacity>
         )}
       />
+
+      <StatusBar backgroundColor={"#ffffff"} barStyle={"dark-content"} />
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
   },
+  background: {
+    overflow: "hidden",
+  },
+
   switch: {
     width: 80,
     height: 40,
@@ -266,6 +299,30 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     elevation: 5,
   },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 12,
+    margin: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    paddingVertical: 2,
+  },
+  emptyContainer: {
+    alignItems: "center",
+    marginTop: 24,
+  },
+  emptyText: {
+    fontSize: 14,
+    opacity: 0.6,
+    fontStyle: "italic",
+  },
+
   buttons: {
     height: 52,
     width: 70,
@@ -282,56 +339,15 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   card: {
-    height: 120,
-    backgroundColor: "#ffffff",
+    minHeight: 90,
     elevation: 5,
-    borderRadius: 10,
-    margin: 8,
-    padding: 8,
+    borderRadius: 12,
+    margin: 6,
+    padding: 10,
     justifyContent: "center",
-    alignItems: "flex-start",
-  },
-  // Detail Screen
-  detailContainer: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  detailHeader: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  backButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  backArrow: {
-    fontSize: 20,
-    color: "#007AFF",
-  },
-  backText: {
-    fontSize: 16,
-    color: "#007AFF",
-  },
-  detailContent: {
-    padding: 20,
-  },
-  detailTitle: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: 16,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#eee",
-    marginBottom: 16,
-  },
-  detailDescription: {
-    fontSize: 16,
-    lineHeight: 26,
-    color: "#444",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
   },
 });
